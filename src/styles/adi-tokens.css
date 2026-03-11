@@ -1,0 +1,37 @@
+/* ADI Harmonic Design System — Color & Typography Tokens */
+:root {
+  /* Brand colors */
+  --adi-navy: #00223E;
+  --adi-navy-dark: #001628;
+  --adi-blue: #0069D9;
+  --adi-blue-dark: #004FA3;
+  --adi-blue-light: #E5F1FF;
+  --adi-teal: #00827F;
+  --adi-teal-light: #E0F4F4;
+
+  /* Neutrals */
+  --adi-gray-50: #F8F9FA;
+  --adi-gray-100: #F0F2F4;
+  --adi-gray-200: #E1E5E9;
+  --adi-gray-300: #C8CDD4;
+  --adi-gray-400: #9AA3AE;
+  --adi-gray-500: #6B7480;
+  --adi-gray-700: #3C424D;
+  --adi-gray-900: #1A1D23;
+
+  /* Semantic */
+  --adi-success: #1A7A4A;
+  --adi-success-bg: #E6F4ED;
+  --adi-warning: #B45309;
+  --adi-warning-bg: #FEF3C7;
+  --adi-error: #C0392B;
+
+  /* Typography */
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Spacing */
+  --header-height: 32px;
+  --nav-height: 64px;
+  --sidebar-width: 420px;
+}
