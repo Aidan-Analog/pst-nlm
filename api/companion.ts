@@ -1,27 +1,26 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Anthropic from '@anthropic-ai/sdk';
-import path from 'path';
-import { loadProducts } from '../server/loader.js';
-
-// Load products once (module-level, cached between warm invocations)
-const products = loadProducts(path.join(process.cwd(), 'data/products.xlsx'));
-
-const sampleProduct = products[0];
-const schemaFields = sampleProduct
-  ? Object.keys(sampleProduct)
-      .filter((k) => !['priceSku'].includes(k))
-      .map((k) => {
-        const v = sampleProduct[k as keyof typeof sampleProduct];
-        return `  - ${k}: ${typeof v} (e.g. ${JSON.stringify(v)})`;
-      })
-      .join('\n')
-  : '';
 
 const SYSTEM_PROMPT = `You are a product selection assistant for Analog Devices (ADI).
 You help engineers filter a PST (Product Selection Table) based on natural language queries.
 
 The product data has these fields:
-${schemaFields}
+  - partNumber: string (e.g. "LT3083")
+  - description: string (e.g. "Adjustable 3A Single Resistor Low Dropout Regulator")
+  - lifecycle: string (e.g. "RECOMMENDED FOR NEW DESIGNS")
+  - price1ku: number (e.g. 4.55)
+  - availability: number (e.g. 80994)
+  - package: string (e.g. "16-Lead DFN")
+  - vinMin: number (e.g. 1.5)
+  - vinMax: number (e.g. 20)
+  - voutMin: number (e.g. 0)
+  - voutMax: number (e.g. 18.5)
+  - ioutMax: number (e.g. 3)
+  - tempMin: number (e.g. -40)
+  - tempMax: number (e.g. 125)
+  - inStock: boolean
+  - rohsCompliant: boolean
+  - surfaceMount: boolean
 
 Key field notes:
 - lifecycle values: "RECOMMENDED FOR NEW DESIGNS" or "PRODUCTION"

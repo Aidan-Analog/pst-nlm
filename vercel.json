@@ -1,5 +1,9 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "framework": "vite",
+  "functions": {
+    "api/products.ts": { "maxDuration": 10 },
+    "api/companion.ts": { "maxDuration": 30 }
+  }
 }
