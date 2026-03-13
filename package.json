@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "concurrently \"vite --host\" \"tsx watch server/index.ts\" --names \"vite,api\" --prefix-colors \"cyan,yellow\"",
     "build": "tsc -b && vite build",
+    "build:server": "tsc -p tsconfig.server.json",
+    "build:all": "npm run build && npm run build:server",
+    "start": "node dist-server/server/index.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },

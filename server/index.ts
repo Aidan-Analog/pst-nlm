@@ -13,7 +13,8 @@ app.use(cors());
 app.use(express.json());
 
 // Load products once at startup
-const products = loadProducts(path.join(__dirname, '../data/products.xlsx'));
+const dataDir = process.env.DATA_DIR ?? path.join(__dirname, '../../data');
+const products = loadProducts(path.join(dataDir, 'products.xlsx'));
 console.log(`[server] Loaded ${products.length} products`);
 
 // Build schema summary for the system prompt
@@ -118,6 +119,13 @@ app.get('/api/products', (_req, res) => {
   res.json(products);
 });
 
+// Serve built frontend (production)
+const distPath = process.env.DIST_DIR ?? path.join(__dirname, '../../dist');
+app.use(express.static(distPath));
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+});
+
 app.listen(PORT, () => {
-  console.log(`[server] API running on http://localhost:${PORT}`);
+  console.log(`[server] Running on http://localhost:${PORT}`);
 });
