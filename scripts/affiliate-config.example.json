@@ -1,0 +1,34 @@
+{
+  "_comment": "Copy this file to affiliate-config.json and fill in your real affiliate URLs.",
+
+  "inputGlob": "content/**/*.{html,md,mdx}",
+
+  "firstOccurrenceOnly": true,
+  "openInNewTab": true,
+  "linkRel": "nofollow sponsored",
+
+  "rules": [
+    {
+      "keyword": "laptop",
+      "url": "https://www.amazon.com/s?k=laptop&tag=YOUR_AMAZON_TAG",
+      "linkText": "laptop"
+    },
+    {
+      "keyword": "noise-cancelling headphones",
+      "url": "https://www.amazon.com/s?k=noise+cancelling+headphones&tag=YOUR_AMAZON_TAG"
+    },
+    {
+      "keyword": "web hosting",
+      "url": "https://www.bluehost.com/track/yourtrackingid/"
+    },
+    {
+      "keyword": "VPN",
+      "url": "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=YOUR_ID",
+      "caseSensitive": true
+    },
+    {
+      "keyword": "password manager",
+      "url": "https://www.dpbolvw.net/click-YOURID-OFFERID"
+    }
+  ]
+}

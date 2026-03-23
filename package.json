@@ -10,7 +10,9 @@
     "build:all": "npm run build && npm run build:server",
     "start": "node dist-server/server/index.js",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "affiliate:inject": "tsx scripts/affiliate-injector.ts --config scripts/affiliate-config.json --report",
+    "affiliate:dry-run": "tsx scripts/affiliate-injector.ts --config scripts/affiliate-config.json --dry-run --report"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
