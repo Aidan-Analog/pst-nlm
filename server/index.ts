@@ -206,7 +206,7 @@ app.post('/api/ltspice-agent', async (req, res) => {
 // Serve built frontend (production)
 const distPath = process.env.DIST_DIR ?? path.join(__dirname, '../../dist');
 app.use(express.static(distPath));
-app.get('*', (_req, res) => {
+app.get('/{*path}', (_req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
