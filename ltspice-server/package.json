@@ -1,0 +1,13 @@
+{
+  "name": "ltspice-server",
+  "version": "1.0.0",
+  "description": "LAN HTTP server that wraps LTspice CLI on macOS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.21.2"
+  }
+}

@@ -4,6 +4,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadProducts } from './loader.js';
+import { runLTspiceAgent } from './ltspice-agent.js';
+import type { AgentRequest } from './ltspice-agent.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -117,6 +119,69 @@ app.post('/api/companion', async (req, res) => {
 // Serve products for the frontend to consume
 app.get('/api/products', (_req, res) => {
   res.json(products);
+});
+
+// ---------------------------------------------------------------------------
+// LTspice Workbench endpoints
+// ---------------------------------------------------------------------------
+
+const LTSPICE_SERVER_URL = process.env.LTSPICE_SERVER_URL ?? 'http://localhost:8765';
+
+/** Health check — proxies to the MacBook LTspice server */
+app.get('/api/ltspice/status', async (_req, res) => {
+  try {
+    const r = await fetch(`${LTSPICE_SERVER_URL}/status`, {
+      signal: AbortSignal.timeout(5_000),
+    });
+    const data = await r.json();
+    res.json(data);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    res.status(503).json({ ok: false, error: `LTspice server unreachable: ${msg}` });
+  }
+});
+
+/** Direct simulation proxy — POST { netlist } → waveform JSON */
+app.post('/api/ltspice/simulate', async (req, res) => {
+  const { netlist } = req.body as { netlist?: string };
+  if (!netlist) return res.status(400).json({ error: 'Missing netlist' });
+
+  try {
+    const r = await fetch(`${LTSPICE_SERVER_URL}/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ netlist }),
+      signal: AbortSignal.timeout(90_000),
+    });
+    const data = await r.json();
+    res.status(r.ok ? 200 : 500).json(data);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    res.status(503).json({ error: `LTspice server unreachable: ${msg}` });
+  }
+});
+
+/**
+ * LTspice Agent — runs the full agentic loop
+ * POST { description, components?, targets? }
+ * Returns { iterations, finalNetlist, finalWaveforms, summary, passed }
+ */
+app.post('/api/ltspice-agent', async (req, res) => {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(503).json({ error: 'ANTHROPIC_API_KEY not set' });
+  }
+
+  const { description, components, targets } = req.body as AgentRequest;
+  if (!description) return res.status(400).json({ error: 'Missing description' });
+
+  try {
+    const result = await runLTspiceAgent(anthropic, { description, components, targets });
+    res.json(result);
+  } catch (err) {
+    console.error('[ltspice-agent] Error:', err);
+    const msg = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ error: msg });
+  }
 });
 
 // Serve built frontend (production)

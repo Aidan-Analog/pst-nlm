@@ -7,6 +7,10 @@ import { useFilteredProducts } from './hooks/useProducts';
 import { useCompanion } from './hooks/useCompanion';
 import type { FilterCondition, Product, SortConfig } from './types/product';
 import { getMockProducts } from './data/mockProducts';
+import Workbench from './pages/Workbench';
+
+// Simple path-based routing — module-level constant, never changes at runtime
+const isWorkbench = window.location.pathname.startsWith('/workbench');
 
 const BREADCRUMB = [
   { label: 'Home', href: '#' },
@@ -15,7 +19,9 @@ const BREADCRUMB = [
   { label: 'TimerBlox' },
 ];
 
-export default function App() {
+/** PST (Product Selection Table) view — extracted so hooks are never
+ *  called conditionally (React rules of hooks). */
+function PSTApp() {
   const [allProducts, setAllProducts] = useState<Product[]>(getMockProducts());
   const [quickFilters, setQuickFilters] = useState<string[]>([]);
   const [companionFilters, setCompanionFilters] = useState<FilterCondition[]>([]);
@@ -137,4 +143,9 @@ export default function App() {
       </div>
     </div>
   );
+}
+
+/** Root component — routes between PST and Workbench based on URL path */
+export default function App() {
+  return isWorkbench ? <Workbench /> : <PSTApp />;
 }
