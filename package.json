@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"vite --host\" \"tsx watch server/index.ts\" --names \"vite,api\" --prefix-colors \"cyan,yellow\"",
+    "workbench:dev": "concurrently \"vite --config vite.workbench.config.ts\" \"tsx watch server/workbench-server.ts\" --names \"vite,wb\" --prefix-colors \"magenta,green\"",
+    "workbench:start": "node dist-server/server/workbench-server.js",
     "build": "tsc -b && vite build",
     "build:server": "tsc -p tsconfig.server.json",
     "build:all": "npm run build && npm run build:server",
