@@ -4,8 +4,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadProducts } from './loader.js';
-import { runLTspiceAgent } from './ltspice-agent.js';
-import type { AgentRequest } from './ltspice-agent.js';
+import { streamLTspiceAgent } from './ltspice-agent.js';
+import type { AgentRequest, AgentEvent } from './ltspice-agent.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -162,25 +162,44 @@ app.post('/api/ltspice/simulate', async (req, res) => {
 });
 
 /**
- * LTspice Agent — runs the full agentic loop
+ * LTspice Agent — SSE streaming endpoint
  * POST { description, components?, targets? }
- * Returns { iterations, finalNetlist, finalWaveforms, summary, passed }
+ * Response: text/event-stream — streams AgentEvent JSON objects
+ * one per line as: data: <json>\n\n
+ *
+ * Frontend consumes via fetch + ReadableStream (see useLTspiceAgent hook).
  */
 app.post('/api/ltspice-agent', async (req, res) => {
   if (!process.env.ANTHROPIC_API_KEY) {
+    res.setHeader('Content-Type', 'application/json');
     return res.status(503).json({ error: 'ANTHROPIC_API_KEY not set' });
   }
 
   const { description, components, targets } = req.body as AgentRequest;
-  if (!description) return res.status(400).json({ error: 'Missing description' });
+  if (!description) {
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(400).json({ error: 'Missing description' });
+  }
+
+  // Set SSE headers before any writes
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no'); // disable nginx buffering
+  res.flushHeaders();
+
+  const sendEvent = (event: AgentEvent) => {
+    res.write(`data: ${JSON.stringify(event)}\n\n`);
+  };
 
   try {
-    const result = await runLTspiceAgent(anthropic, { description, components, targets });
-    res.json(result);
+    await streamLTspiceAgent(anthropic, { description, components, targets }, sendEvent);
   } catch (err) {
     console.error('[ltspice-agent] Error:', err);
     const msg = err instanceof Error ? err.message : String(err);
-    res.status(500).json({ error: msg });
+    sendEvent({ type: 'error', message: msg });
+  } finally {
+    res.end();
   }
 });
 
