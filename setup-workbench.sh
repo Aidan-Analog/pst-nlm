@@ -66,7 +66,7 @@ fi
 # ── 5. Write .env ───────────────────────────────────────────────────────────
 ENV_FILE="$DIR/.env"
 
-if grep -q "your_api_key_here" "$ENV_FILE" 2>/dev/null; then
+if [ ! -f "$ENV_FILE" ] || grep -q "your_api_key_here" "$ENV_FILE" 2>/dev/null; then
   echo ""
   echo "→ Enter your Anthropic API key (from console.anthropic.com):"
   read -r -p "  API key: " API_KEY
