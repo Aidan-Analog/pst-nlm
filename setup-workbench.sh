@@ -89,13 +89,13 @@ echo "✓ .env written"
 # ── 6. Install ltspice-server dependencies ──────────────────────────────────
 echo "→ Installing ltspice-server dependencies..."
 cd "$LTSPICE_SERVER_DIR"
-npm install --silent
+npm install
 echo "✓ ltspice-server ready"
 
 # ── 7. Install main project dependencies ────────────────────────────────────
 echo "→ Installing workbench dependencies..."
 cd "$DIR"
-npm install --silent
+npm install
 echo "✓ workbench ready"
 
 # ── 8. Start both servers ───────────────────────────────────────────────────
@@ -109,19 +109,24 @@ echo ""
 echo "Press Ctrl+C to stop."
 echo ""
 
-# Start LTspice server in background
+# Start LTspice server in background, capturing output to a log
+LTSPICE_LOG="$LTSPICE_SERVER_DIR/server.log"
 cd "$LTSPICE_SERVER_DIR"
-LTSPICE_BIN="$LTSPICE_BIN" node server.js &
+LTSPICE_BIN="$LTSPICE_BIN" node server.js > "$LTSPICE_LOG" 2>&1 &
 LTSPICE_PID=$!
 
-sleep 1
+sleep 2
 
 # Verify LTspice server started
 if ! kill -0 "$LTSPICE_PID" 2>/dev/null; then
-  echo "ERROR: LTspice server failed to start."
+  echo "ERROR: LTspice server failed to start. Log output:"
+  echo "──────────────────────────────────────────────────"
+  cat "$LTSPICE_LOG"
+  echo "──────────────────────────────────────────────────"
   exit 1
 fi
 echo "✓ LTspice server running (PID $LTSPICE_PID)"
+cat "$LTSPICE_LOG"
 
 # Start workbench (API + Vite) in foreground
 cd "$DIR"
