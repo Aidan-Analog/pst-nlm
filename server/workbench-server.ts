@@ -20,15 +20,27 @@ import express from 'express';
 import cors from 'cors';
 import Anthropic from '@anthropic-ai/sdk';
 import path from 'path';
+import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { streamLTspiceAgent } from './ltspice-agent.js';
 import type { AgentRequest, AgentEvent } from './ltspice-agent.js';
+
+// Load .env from project root (no dotenv dependency required)
+try {
+  const envText = readFileSync(path.join(process.cwd(), '.env'), 'utf8');
+  for (const line of envText.split('\n')) {
+    const m = line.match(/^([^#\s][^=]*)=(.*)$/);
+    if (m && !process.env[m[1].trim()]) {
+      process.env[m[1].trim()] = m[2].trim();
+    }
+  }
+} catch { /* .env is optional */ }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3002;
-const LTSPICE_SERVER_URL = process.env.LTSPICE_SERVER_URL ?? 'http://192.168.0.70:8765';
+const LTSPICE_SERVER_URL = process.env.LTSPICE_SERVER_URL ?? 'http://localhost:8765';
 
 // Allow requests from Figma Make dev server and local origins
 app.use(cors({
