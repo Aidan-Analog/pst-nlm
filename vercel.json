@@ -4,6 +4,7 @@
   "framework": "vite",
   "functions": {
     "api/products.ts": { "maxDuration": 10 },
-    "api/companion.ts": { "maxDuration": 30 }
+    "api/companion.ts": { "maxDuration": 30 },
+    "api/price-compare.ts": { "maxDuration": 30 }
   }
 }
