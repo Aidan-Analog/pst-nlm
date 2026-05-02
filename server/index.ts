@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadProducts } from './loader.js';
+import { priceCompareHandler } from '../api/price-compare.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -117,6 +118,24 @@ app.post('/api/companion', async (req, res) => {
 // Serve products for the frontend to consume
 app.get('/api/products', (_req, res) => {
   res.json(products);
+});
+
+app.post('/api/price-compare', async (req, res) => {
+  const { name, region = 'uk' } = req.body as { name?: string; region?: string };
+  if (!name || typeof name !== 'string') {
+    return res.status(400).json({ error: 'Missing product name' });
+  }
+  const validRegions = ['us', 'uk', 'europe'] as const;
+  const safeRegion = validRegions.includes(region as 'us' | 'uk' | 'europe')
+    ? (region as 'us' | 'uk' | 'europe')
+    : 'uk';
+  try {
+    const result = await priceCompareHandler(name, safeRegion);
+    res.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    res.status(500).json({ error: msg, results: [], normalizedQuery: name, region: safeRegion });
+  }
 });
 
 // Serve built frontend (production)

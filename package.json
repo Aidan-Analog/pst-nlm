@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "build:server": "tsc -p tsconfig.server.json",
     "build:all": "npm run build && npm run build:server",
+    "build:extension": "vite build --config extension/vite.config.extension.ts",
     "start": "node dist-server/server/index.js",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/chrome": "^0.0.300",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^24.10.1",
