@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadProducts } from './loader.js';
+import trackerRouter from './routes/tracker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -118,6 +119,8 @@ app.post('/api/companion', async (req, res) => {
 app.get('/api/products', (_req, res) => {
   res.json(products);
 });
+
+app.use('/api/tracker', trackerRouter);
 
 // Serve built frontend (production)
 const distPath = process.env.DIST_DIR ?? path.join(__dirname, '../../dist');
