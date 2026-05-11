@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+/* ─── CSS Custom Properties ─────────────────────────────────────────────── */
+
+:root {
+  --tx-duration: 300ms;
+  --tx-easing: ease;
+  --mi-duration: 400ms;
+  --mi-easing: ease;
+  --mi-delay: 0ms;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+
+/* ─── Screen Transition Keyframes ──────────────────────────────────────── */
+
+@keyframes fadeIn          { from { opacity: 0; }              to { opacity: 1; } }
+@keyframes fadeOut         { from { opacity: 1; }              to { opacity: 0; } }
+@keyframes slideInRight    { from { transform: translateX(100%); }  to { transform: translateX(0); } }
+@keyframes slideOutLeft    { from { transform: translateX(0); }     to { transform: translateX(-100%); } }
+@keyframes slideInLeft     { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes slideOutRight   { from { transform: translateX(0); }     to { transform: translateX(100%); } }
+@keyframes slideInUp       { from { transform: translateY(100%); }  to { transform: translateY(0); } }
+@keyframes slideOutDown    { from { transform: translateY(0); }     to { transform: translateY(100%); } }
+@keyframes slideInDown     { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+@keyframes slideOutUp      { from { transform: translateY(0); }     to { transform: translateY(-100%); } }
+@keyframes scaleIn         { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+@keyframes scaleOut        { from { opacity: 1; transform: scale(1); }    to { opacity: 0; transform: scale(1.1); } }
+
+/* Screen enter classes */
+.screen-enter-fade        { animation: fadeIn       var(--tx-duration) var(--tx-easing) forwards; }
+.screen-enter-slide-left  { animation: slideInRight var(--tx-duration) var(--tx-easing) forwards; }
+.screen-enter-slide-right { animation: slideInLeft  var(--tx-duration) var(--tx-easing) forwards; }
+.screen-enter-slide-up    { animation: slideInUp    var(--tx-duration) var(--tx-easing) forwards; }
+.screen-enter-slide-down  { animation: slideInDown  var(--tx-duration) var(--tx-easing) forwards; }
+.screen-enter-scale       { animation: scaleIn      var(--tx-duration) var(--tx-easing) forwards; }
+
+/* Screen leave classes */
+.screen-leave-fade        { animation: fadeOut      var(--tx-duration) var(--tx-easing) forwards; }
+.screen-leave-slide-left  { animation: slideOutLeft  var(--tx-duration) var(--tx-easing) forwards; }
+.screen-leave-slide-right { animation: slideOutRight var(--tx-duration) var(--tx-easing) forwards; }
+.screen-leave-slide-up    { animation: slideOutDown  var(--tx-duration) var(--tx-easing) forwards; }
+.screen-leave-slide-down  { animation: slideOutUp    var(--tx-duration) var(--tx-easing) forwards; }
+.screen-leave-scale       { animation: scaleOut      var(--tx-duration) var(--tx-easing) forwards; }
+
+/* ─── Micro-interaction Keyframes ───────────────────────────────────────── */
+
+@keyframes miFadeIn        { from { opacity: 0; }                        to { opacity: 1; } }
+@keyframes miSlideInLeft   { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes miSlideInRight  { from { opacity: 0; transform: translateX(20px); }  to { opacity: 1; transform: translateX(0); } }
+@keyframes miSlideInUp     { from { opacity: 0; transform: translateY(20px); }  to { opacity: 1; transform: translateY(0); } }
+@keyframes miSlideInDown   { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes miScaleIn       { from { opacity: 0; transform: scale(0); }   to { opacity: 1; transform: scale(1); } }
+@keyframes miPulse         { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes miBounce        { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+.micro-animate-fade-in       { animation: miFadeIn      var(--mi-duration) var(--mi-easing) var(--mi-delay) forwards; }
+.micro-animate-slide-in-left { animation: miSlideInLeft var(--mi-duration) var(--mi-easing) var(--mi-delay) forwards; }
+.micro-animate-slide-in-right{ animation: miSlideInRight var(--mi-duration) var(--mi-easing) var(--mi-delay) forwards; }
+.micro-animate-slide-in-up   { animation: miSlideInUp   var(--mi-duration) var(--mi-easing) var(--mi-delay) forwards; }
+.micro-animate-slide-in-down { animation: miSlideInDown var(--mi-duration) var(--mi-easing) var(--mi-delay) forwards; }
+.micro-animate-scale-in      { animation: miScaleIn     var(--mi-duration) var(--mi-easing) var(--mi-delay) forwards; }
+.micro-animate-pulse         { animation: miPulse       var(--mi-duration) var(--mi-easing) var(--mi-delay) infinite; }
+.micro-animate-bounce        { animation: miBounce      var(--mi-duration) var(--mi-easing) var(--mi-delay) infinite; }
+
+/* ─── Editor Overlays ────────────────────────────────────────────────────── */
+
+.canvas-crosshair { cursor: crosshair; }
+
+.draw-preview-rect {
+  position: absolute;
+  pointer-events: none;
+  border: 2px dashed #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.hotspot-overlay {
+  position: absolute;
+  border: 2px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.18);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.hotspot-overlay:hover   { background: rgba(59, 130, 246, 0.32); }
+.hotspot-overlay.selected { border-color: #1d4ed8; box-shadow: 0 0 0 2px #93c5fd; }
+
+.micro-overlay {
+  position: absolute;
+  border: 2px solid #f59e0b;
+  background: rgba(245, 158, 11, 0.18);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.micro-overlay:hover   { background: rgba(245, 158, 11, 0.32); }
+.micro-overlay.selected { border-color: #d97706; box-shadow: 0 0 0 2px #fcd34d; }
+
+/* ─── Preview Hotspot Click Zones ────────────────────────────────────────── */
+.preview-hotspot-zone {
+  position: absolute;
+  cursor: pointer;
+}
+.preview-hotspot-zone:hover {
+  background: rgba(59, 130, 246, 0.1);
+  outline: 2px dashed rgba(59, 130, 246, 0.4);
+}
+
+/* ─── Scrollbars ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
