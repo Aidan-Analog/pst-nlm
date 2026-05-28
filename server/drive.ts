@@ -69,6 +69,32 @@ function normalize(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
 }
 
+function levenshtein(a: string, b: string): number {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const temp = row[j];
+      row[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, row[j], row[j - 1]);
+      prev = temp;
+    }
+  }
+  return row[b.length];
+}
+
+function strSimilarity(a: string, b: string): number {
+  if (a === b) return 1;
+  return 1 - levenshtein(a, b) / Math.max(a.length, b.length, 1);
+}
+
+function wordOverlap(a: string, b: string): number {
+  const wa = a.split(' ').filter(w => w.length > 1);
+  const wb = new Set(b.split(' ').filter(w => w.length > 1));
+  if (wa.length === 0) return 0;
+  return wa.filter(w => wb.has(w)).length / wa.length;
+}
+
 // Extract the instrument name from a PDF filename.
 // Handles: "01 - Tuba - Song Name.pdf"  and  "Alto Saxophone - Song Name.pdf"
 function extractInstrument(filename: string): string | null {
@@ -153,10 +179,38 @@ export async function buildGigFolder(
     const key = normalize(songTitle);
     let folder = songFolderMap.get(key);
 
-    // Fuzzy fallback: check if folder name contains the song title or vice versa
+    // Tier 2: substring containment ("Mustang" → "Mustang Sally")
     if (!folder) {
       for (const [fKey, fData] of songFolderMap) {
         if (fKey.includes(key) || key.includes(fKey)) { folder = fData; break; }
+      }
+    }
+
+    // Tier 3: word-token overlap (handles shortened/partial titles, word reordering)
+    if (!folder) {
+      let bestScore = 0;
+      let bestData: { id: string; name: string } | undefined;
+      for (const [fKey, fData] of songFolderMap) {
+        const score = Math.max(wordOverlap(key, fKey), wordOverlap(fKey, key));
+        if (score > 0.6 && score > bestScore) { bestScore = score; bestData = fData; }
+      }
+      if (bestData) {
+        console.log(`[drive] word-overlap match: "${songTitle}" → "${bestData.name}" (${bestScore.toFixed(2)})`);
+        folder = bestData;
+      }
+    }
+
+    // Tier 4: Levenshtein similarity (handles typos and spelling errors)
+    if (!folder) {
+      let bestScore = 0;
+      let bestData: { id: string; name: string } | undefined;
+      for (const [fKey, fData] of songFolderMap) {
+        const score = strSimilarity(key, fKey);
+        if (score >= 0.75 && score > bestScore) { bestScore = score; bestData = fData; }
+      }
+      if (bestData) {
+        console.log(`[drive] levenshtein match: "${songTitle}" → "${bestData.name}" (${bestScore.toFixed(2)})`);
+        folder = bestData;
       }
     }
 
