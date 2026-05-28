@@ -10,7 +10,6 @@ export interface SetGroup {
 }
 
 export interface Setlist {
-  id: string;
   created_at: string;
   gig_name: string | null;
   gig_date: string | null;

@@ -1,11 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import Anthropic from '@anthropic-ai/sdk';
-import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadProducts } from './loader.js';
 import { startWhatsAppBot } from './whatsapp-bot.js';
+import { readCurrentSetlist, writeCurrentSetlist } from './drive.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -89,21 +89,14 @@ app.post('/api/companion', async (req, res) => {
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
-      messages: [
-        { role: 'user', content: query },
-      ],
+      messages: [{ role: 'user', content: query }],
     });
 
     const text = response.content[0].type === 'text' ? response.content[0].text : '';
-
-    // Extract JSON from the response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in Claude response');
-    }
+    if (!jsonMatch) throw new Error('No JSON found in Claude response');
 
     const parsed = JSON.parse(jsonMatch[0]);
-
     res.json({
       filters: parsed.filters || [],
       sort: parsed.sort || null,
@@ -116,7 +109,6 @@ app.post('/api/companion', async (req, res) => {
   }
 });
 
-// Serve products for the frontend to consume
 app.get('/api/products', (_req, res) => {
   res.json(products);
 });
@@ -147,7 +139,7 @@ Rules:
 - Do not infer or add keys, tempos, or any information not present in the message
 - Ignore greetings, sign-offs, and emoji`;
 
-// Shared parse-and-publish logic used by both the HTTP endpoint and the WhatsApp bot
+// Shared by both the HTTP endpoint and the WhatsApp bot
 async function parseAndPublish(text: string): Promise<void> {
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
@@ -160,17 +152,13 @@ async function parseAndPublish(text: string): Promise<void> {
   if (!jsonMatch) throw new Error('No JSON in Claude response');
   const parsed = JSON.parse(jsonMatch[0]);
 
-  const supabase = getSupabase();
-  if (!supabase) throw new Error('Supabase not configured');
-  const { error } = await supabase
-    .from('setlists')
-    .insert({
-      gig_name: parsed.gigName ?? null,
-      gig_date: parsed.gigDate ?? null,
-      raw_text: text,
-      sets: parsed.sets ?? [],
-    });
-  if (error) throw new Error(error.message);
+  await writeCurrentSetlist({
+    gig_name: parsed.gigName ?? null,
+    gig_date: parsed.gigDate ?? null,
+    raw_text: text,
+    sets: parsed.sets ?? [],
+    created_at: new Date().toISOString(),
+  });
 }
 
 app.post('/api/setlist-parse', async (req, res) => {
@@ -198,24 +186,13 @@ app.post('/api/setlist-parse', async (req, res) => {
   }
 });
 
-function getSupabase() {
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) return null;
-  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-}
-
 app.get('/api/setlist', async (_req, res) => {
-  const supabase = getSupabase();
-  if (!supabase) return res.json(null);
-  const { data, error } = await supabase
-    .from('setlists')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
-  if (error && error.code !== 'PGRST116') {
-    return res.status(500).json({ error: error.message });
+  try {
+    const data = await readCurrentSetlist();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Unknown error' });
   }
-  res.json(data ?? null);
 });
 
 app.post('/api/setlist', async (req, res) => {
@@ -223,19 +200,23 @@ app.post('/api/setlist', async (req, res) => {
   if (passphrase && req.headers['x-setlist-passphrase'] !== passphrase) {
     return res.status(403).json({ error: 'Invalid passphrase' });
   }
-  const supabase = getSupabase();
-  if (!supabase) return res.status(503).json({ error: 'Supabase not configured' });
   const { gigName, gigDate, rawText, sets } = req.body as {
     gigName?: string; gigDate?: string; rawText?: string; sets?: unknown;
   };
   if (!rawText || !sets) return res.status(400).json({ error: 'Missing rawText or sets' });
-  const { data, error } = await supabase
-    .from('setlists')
-    .insert({ gig_name: gigName ?? null, gig_date: gigDate ?? null, raw_text: rawText, sets })
-    .select()
-    .single();
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json(data);
+  try {
+    const record = {
+      gig_name: gigName ?? null,
+      gig_date: gigDate ?? null,
+      raw_text: rawText,
+      sets,
+      created_at: new Date().toISOString(),
+    };
+    await writeCurrentSetlist(record);
+    res.status(201).json(record);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Unknown error' });
+  }
 });
 
 // Serve built frontend (production)
