@@ -7,6 +7,8 @@ import { useFilteredProducts } from './hooks/useProducts';
 import { useCompanion } from './hooks/useCompanion';
 import type { FilterCondition, Product, SortConfig } from './types/product';
 import { getMockProducts } from './data/mockProducts';
+import SetlistView from './pages/SetlistView';
+import SetlistAdmin from './pages/SetlistAdmin';
 
 const BREADCRUMB = [
   { label: 'Home', href: '#' },
@@ -15,14 +17,13 @@ const BREADCRUMB = [
   { label: 'TimerBlox' },
 ];
 
-export default function App() {
+function ProductApp() {
   const [allProducts, setAllProducts] = useState<Product[]>(getMockProducts());
   const [quickFilters, setQuickFilters] = useState<string[]>([]);
   const [companionFilters, setCompanionFilters] = useState<FilterCondition[]>([]);
   const [columnSort, setColumnSort] = useState<SortConfig | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Load products from server (Excel data) on mount
   useEffect(() => {
     fetch('/api/products')
       .then(r => r.ok ? r.json() : null)
@@ -137,4 +138,11 @@ export default function App() {
       </div>
     </div>
   );
+}
+
+export default function App() {
+  const path = window.location.pathname;
+  if (path === '/setlist/admin') return <SetlistAdmin />;
+  if (path.startsWith('/setlist')) return <SetlistView />;
+  return <ProductApp />;
 }

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import Anthropic from '@anthropic-ai/sdk';
+import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadProducts } from './loader.js';
@@ -117,6 +118,97 @@ app.post('/api/companion', async (req, res) => {
 // Serve products for the frontend to consume
 app.get('/api/products', (_req, res) => {
   res.json(products);
+});
+
+// ── Setlist endpoints ──────────────────────────────────────────────────────
+
+const SETLIST_PARSE_PROMPT = `You are parsing a WhatsApp message from a Musical Director into a structured setlist.
+Return ONLY valid JSON with no markdown, no explanation:
+{
+  "gigName": string | null,
+  "gigDate": string | null,
+  "sets": [
+    {
+      "label": string,
+      "songs": [
+        { "position": number, "title": string, "notes": string | null }
+      ]
+    }
+  ]
+}
+
+Rules:
+- Preserve the numbered order exactly as written
+- Group songs into sets based on any "SET 1 / SET 2 / BREAK" labels; if none, use a single set with label "SET"
+- Capture any inline note on a song in the notes field, otherwise notes is null
+- gigDate should be ISO format (YYYY-MM-DD) if a date is mentioned, otherwise null
+- gigName should be a venue or event name if mentioned, otherwise null
+- Do not infer or add keys, tempos, or any information not present in the message
+- Ignore greetings, sign-offs, and emoji`;
+
+app.post('/api/setlist-parse', async (req, res) => {
+  const { text } = req.body as { text?: string };
+  if (!text || typeof text !== 'string' || !text.trim()) {
+    return res.status(400).json({ error: 'Missing text' });
+  }
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(503).json({ error: 'ANTHROPIC_API_KEY not configured' });
+  }
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      system: SETLIST_PARSE_PROMPT,
+      messages: [{ role: 'user', content: text }],
+    });
+    const raw = response.content[0].type === 'text' ? response.content[0].text : '';
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON in Claude response');
+    res.json(JSON.parse(jsonMatch[0]));
+  } catch (err) {
+    console.error('[setlist-parse] Error:', err);
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Unknown error' });
+  }
+});
+
+function getSupabase() {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) return null;
+  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+}
+
+app.get('/api/setlist', async (_req, res) => {
+  const supabase = getSupabase();
+  if (!supabase) return res.json(null);
+  const { data, error } = await supabase
+    .from('setlists')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+  if (error && error.code !== 'PGRST116') {
+    return res.status(500).json({ error: error.message });
+  }
+  res.json(data ?? null);
+});
+
+app.post('/api/setlist', async (req, res) => {
+  const passphrase = process.env.SETLIST_PASSPHRASE;
+  if (passphrase && req.headers['x-setlist-passphrase'] !== passphrase) {
+    return res.status(403).json({ error: 'Invalid passphrase' });
+  }
+  const supabase = getSupabase();
+  if (!supabase) return res.status(503).json({ error: 'Supabase not configured' });
+  const { gigName, gigDate, rawText, sets } = req.body as {
+    gigName?: string; gigDate?: string; rawText?: string; sets?: unknown;
+  };
+  if (!rawText || !sets) return res.status(400).json({ error: 'Missing rawText or sets' });
+  const { data, error } = await supabase
+    .from('setlists')
+    .insert({ gig_name: gigName ?? null, gig_date: gigDate ?? null, raw_text: rawText, sets })
+    .select()
+    .single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json(data);
 });
 
 // Serve built frontend (production)
