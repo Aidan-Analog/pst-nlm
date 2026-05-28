@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadProducts } from './loader.js';
+import { startWhatsAppBot } from './whatsapp-bot.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -146,6 +147,32 @@ Rules:
 - Do not infer or add keys, tempos, or any information not present in the message
 - Ignore greetings, sign-offs, and emoji`;
 
+// Shared parse-and-publish logic used by both the HTTP endpoint and the WhatsApp bot
+async function parseAndPublish(text: string): Promise<void> {
+  const response = await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1024,
+    system: SETLIST_PARSE_PROMPT,
+    messages: [{ role: 'user', content: text }],
+  });
+  const raw = response.content[0].type === 'text' ? response.content[0].text : '';
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('No JSON in Claude response');
+  const parsed = JSON.parse(jsonMatch[0]);
+
+  const supabase = getSupabase();
+  if (!supabase) throw new Error('Supabase not configured');
+  const { error } = await supabase
+    .from('setlists')
+    .insert({
+      gig_name: parsed.gigName ?? null,
+      gig_date: parsed.gigDate ?? null,
+      raw_text: text,
+      sets: parsed.sets ?? [],
+    });
+  if (error) throw new Error(error.message);
+}
+
 app.post('/api/setlist-parse', async (req, res) => {
   const { text } = req.body as { text?: string };
   if (!text || typeof text !== 'string' || !text.trim()) {
@@ -220,4 +247,7 @@ app.get('*', (_req, res) => {
 
 app.listen(PORT, () => {
   console.log(`[server] Running on http://localhost:${PORT}`);
+  startWhatsAppBot(parseAndPublish).catch(err =>
+    console.error('[whatsapp] Failed to start bot:', err)
+  );
 });
