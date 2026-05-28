@@ -82,6 +82,30 @@ export default function SetlistView() {
         <div style={headerMeta}>{totalSongs} songs · updated {publishedDate}</div>
       </div>
 
+      {setlist.gig_folder_url && (
+        <div style={{ padding: '14px 20px', background: '#f0f4ff', borderBottom: '1px solid #dde4f5' }}>
+          <a
+            href={setlist.gig_folder_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              color: '#1a1a2e',
+              textDecoration: 'none',
+              fontSize: 14,
+              fontWeight: 600,
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            </svg>
+            Open sheet music in Drive →
+          </a>
+        </div>
+      )}
+
       <div style={{ padding: '0 20px 40px' }}>
         {setlist.sets.map((set, i) => (
           <div key={i} style={{ marginTop: 28 }}>

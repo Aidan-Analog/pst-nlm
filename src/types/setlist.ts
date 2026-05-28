@@ -15,6 +15,7 @@ export interface Setlist {
   gig_date: string | null;
   raw_text: string;
   sets: SetGroup[];
+  gig_folder_url: string | null;
 }
 
 export interface ParsedSetlist {

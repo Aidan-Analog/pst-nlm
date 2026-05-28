@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadProducts } from './loader.js';
 import { startWhatsAppBot } from './whatsapp-bot.js';
-import { readCurrentSetlist, writeCurrentSetlist } from './drive.js';
+import { readCurrentSetlist, writeCurrentSetlist, buildGigFolder } from './drive.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -139,6 +139,29 @@ Rules:
 - Do not infer or add keys, tempos, or any information not present in the message
 - Ignore greetings, sign-offs, and emoji`;
 
+function allSongTitles(sets: { songs: { title: string }[] }[]): string[] {
+  return sets.flatMap(s => s.songs.map(song => song.title));
+}
+
+async function triggerGigFolder(
+  gigName: string | null,
+  gigDate: string | null,
+  sets: { songs: { title: string }[] }[]
+): Promise<void> {
+  const titles = allSongTitles(sets);
+  if (titles.length === 0) return;
+  try {
+    const result = await buildGigFolder(gigName, gigDate, titles);
+    // Patch gig_folder_url back into the stored setlist JSON
+    const current = await readCurrentSetlist() as Record<string, unknown> | null;
+    if (current) {
+      await writeCurrentSetlist({ ...current, gig_folder_url: result.folderUrl });
+    }
+  } catch (err) {
+    console.error('[server] buildGigFolder failed:', err);
+  }
+}
+
 // Shared by both the HTTP endpoint and the WhatsApp bot
 async function parseAndPublish(text: string): Promise<void> {
   const response = await anthropic.messages.create({
@@ -158,7 +181,11 @@ async function parseAndPublish(text: string): Promise<void> {
     raw_text: text,
     sets: parsed.sets ?? [],
     created_at: new Date().toISOString(),
+    gig_folder_url: null,
   });
+
+  // Build the gig Drive folder in background — patches gig_folder_url when ready
+  triggerGigFolder(parsed.gigName ?? null, parsed.gigDate ?? null, parsed.sets ?? []);
 }
 
 app.post('/api/setlist-parse', async (req, res) => {
@@ -211,8 +238,15 @@ app.post('/api/setlist', async (req, res) => {
       raw_text: rawText,
       sets,
       created_at: new Date().toISOString(),
+      gig_folder_url: null,
     };
     await writeCurrentSetlist(record);
+    // Build Drive gig folder in background
+    triggerGigFolder(
+      gigName ?? null,
+      gigDate ?? null,
+      (sets as { songs: { title: string }[] }[]) ?? []
+    );
     res.status(201).json(record);
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : 'Unknown error' });
