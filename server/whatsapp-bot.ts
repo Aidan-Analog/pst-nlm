@@ -64,7 +64,7 @@ export async function startWhatsAppBot(
       // Request a pairing code the first time a QR is generated (headless-friendly)
       if (qr) {
         try {
-          const code = await sock.requestPairingCode(mdNumber);
+          const code = await sock.requestPairingCode(mdNumber!);
           console.log(`[whatsapp] Pairing code for ${mdNumber}: ${code}`);
           console.log('[whatsapp] On your phone: WhatsApp → Settings → Linked Devices → Link a Device → Link with phone number');
         } catch {
@@ -111,7 +111,7 @@ export async function startWhatsAppBot(
         if (targetGroupJid && msg.key.remoteJid !== targetGroupJid) continue;
 
         const senderJid = msg.key.participant ?? '';
-        if (!senderJid.startsWith(mdNumber)) continue;
+        if (!senderJid.startsWith(mdNumber!)) continue;
 
         const text = extractText(msg.message);
         if (!text || !looksLikeSetlist(text)) continue;
