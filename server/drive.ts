@@ -106,22 +106,42 @@ function extractInstrument(filename: string): string | null {
   return null;
 }
 
-// Map the raw instrument name from the filename to a clean gig-subfolder name
+// Map the raw instrument name from the filename to a canonical part name
 function instrumentToFolder(raw: string): string {
   const s = raw.toLowerCase().replace(/[()♭]/g, '').replace(/\s+/g, ' ').trim();
-  if (s.includes('trumpet'))                                      return 'Trumpet';
-  if (s === 'alto saxophone' || s.includes('alto sax'))          return 'Alto Sax';
-  if (s === 'tenor saxophone' || s.includes('tenor sax'))        return 'Tenor Sax';
+  if (s.includes('trumpet 3'))                                              return 'Trumpet 3';
+  if (s.includes('trumpet 2'))                                              return 'Trumpet 2';
+  if (s.includes('trumpet 1') || s === 'trumpet')                          return 'Trumpet 1';
+  if (s === 'alto saxophone' || s.includes('alto sax'))                    return 'Alto Sax';
+  if (s === 'tenor saxophone' || s.includes('tenor sax'))                  return 'Tenor Sax';
   if (s === 'baritone saxophone' || s.includes('baritone sax') || s.includes('bari sax')) return 'Baritone Sax';
-  if (s === 'trombone 2' || s.includes('trombone 2'))            return 'Trombone 2';
+  if (s === 'trombone 2' || s.includes('trombone 2'))                      return 'Trombone 2';
   if (s === 'trombone 1' || s.includes('trombone 1') || s === 'trombone') return 'Trombone 1';
-  if (s.includes('tuba'))                                        return 'Tuba';
-  if (s.includes('drum') || s.includes('percussion'))            return 'Percussion';
-  if (s.includes('bass guitar') || s.includes('bass gtr'))       return 'Bass Guitar';
-  if (s.includes('euphonium'))                                   return 'Euphonium';
-  if (s.includes('keyboard') || s.includes('keys'))             return 'Keys';
-  return raw; // fallback: keep raw name
+  if (s.includes('tuba') || s.includes('sousa') || s.includes('sousaphone')) return 'Tuba';
+  if (s.includes('drum') || s.includes('percussion'))                      return 'Percussion';
+  if (s.includes('bass guitar') || s.includes('bass gtr'))                 return 'Bass Guitar';
+  if (s.includes('euphonium'))                                             return 'Euphonium';
+  if (s.includes('keyboard') || s.includes('keys'))                       return 'Keys';
+  return raw;
 }
+
+// Each player mapped to the canonical part name(s) they receive.
+// Trombone players get both parts until individual assignments are added.
+const PLAYERS: Record<string, string[]> = {
+  Benny:    ['Baritone Sax'],
+  Ger:      ['Baritone Sax'],
+  Danielle: ['Alto Sax'],
+  Ken:      ['Alto Sax'],
+  Padraig:  ['Tenor Sax'],
+  Damien:   ['Trombone 1', 'Trombone 2'],
+  Elva:     ['Trombone 1', 'Trombone 2'],
+  Cathal:   ['Trombone 1', 'Trombone 2'],
+  Gerry:    ['Trumpet 1'],
+  Alma:     ['Trumpet 2'],
+  Frank:    ['Trumpet 3'],
+  Aidan:    ['Percussion'],
+  Arnold:   ['Tuba'],
+};
 
 export interface GigFolderResult {
   folderUrl: string;
@@ -233,19 +253,24 @@ export async function buildGigFolder(
     }
   }
 
-  // 5. Create instrument subfolders and copy the PDFs in
-  for (const [instrumentName, files] of instrumentFiles) {
+  // 5. Create a subfolder per player and copy their part's PDFs in
+  let playerFolderCount = 0;
+  for (const [playerName, parts] of Object.entries(PLAYERS)) {
+    const playerFiles = parts.flatMap(p => instrumentFiles.get(p) ?? []);
+    if (playerFiles.length === 0) continue;
+
     const subfolderRes = await drive.files.create({
       requestBody: {
-        name: instrumentName,
+        name: playerName,
         mimeType: 'application/vnd.google-apps.folder',
         parents: [gigFolderId],
       },
       fields: 'id',
     });
     const subfolderId = subfolderRes.data.id!;
+    playerFolderCount++;
 
-    for (const { fileId, filename } of files) {
+    for (const { fileId, filename } of playerFiles) {
       try {
         await drive.files.copy({
           fileId,
@@ -253,7 +278,7 @@ export async function buildGigFolder(
           fields: 'id',
         });
       } catch (err) {
-        console.error(`[drive] Could not copy "${filename}":`, (err as Error).message);
+        console.error(`[drive] Could not copy "${filename}" for ${playerName}:`, (err as Error).message);
       }
     }
   }
@@ -261,7 +286,7 @@ export async function buildGigFolder(
   if (unmatched.length > 0) {
     console.warn('[drive] Songs not found in Drive:', unmatched.join(', '));
   }
-  console.log(`[drive] Gig folder created: ${folderUrl} (${matched.length} songs, ${instrumentFiles.size} instruments)`);
+  console.log(`[drive] Gig folder created: ${folderUrl} (${matched.length} songs, ${playerFolderCount} players)`);
 
   return { folderUrl, matched, unmatched };
 }
