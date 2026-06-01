@@ -16,6 +16,9 @@ src/**/*.js
 .env
 .env.*
 
+# WhatsApp session credentials (never commit)
+data/wa-session/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
