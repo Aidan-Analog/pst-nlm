@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { startWhatsAppBot } from './whatsapp-bot.js';
-import { readCurrentSetlist, writeCurrentSetlist, buildGigFolder } from './drive.js';
+import { readCurrentSetlist, writeCurrentSetlist, buildGigFolder, type SetGroup } from './drive.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -41,19 +41,14 @@ Rules:
 - Do not infer or add keys, tempos, or any information not present in the message
 - Ignore greetings, sign-offs, and emoji`;
 
-function allSongTitles(sets: { songs: { title: string }[] }[]): string[] {
-  return sets.flatMap(s => s.songs.map(song => song.title));
-}
-
 async function triggerGigFolder(
   gigName: string | null,
   gigDate: string | null,
-  sets: { songs: { title: string }[] }[]
+  sets: SetGroup[]
 ): Promise<void> {
-  const titles = allSongTitles(sets);
-  if (titles.length === 0) return;
+  if (sets.flatMap(s => s.songs).length === 0) return;
   try {
-    const result = await buildGigFolder(gigName, gigDate, titles);
+    const result = await buildGigFolder(gigName, gigDate, sets);
     const current = await readCurrentSetlist() as Record<string, unknown> | null;
     if (current) {
       await writeCurrentSetlist({ ...current, gig_folder_url: result.folderUrl });
@@ -140,11 +135,7 @@ app.post('/api/setlist', async (req, res) => {
       gig_folder_url: null,
     };
     await writeCurrentSetlist(record);
-    triggerGigFolder(
-      gigName ?? null,
-      gigDate ?? null,
-      (sets as { songs: { title: string }[] }[]) ?? []
-    );
+    triggerGigFolder(gigName ?? null, gigDate ?? null, (sets as SetGroup[]) ?? []);
     res.status(201).json(record);
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : 'Unknown error' });

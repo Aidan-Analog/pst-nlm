@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { Readable } from 'stream';
+import PDFDocument from 'pdfkit';
 
 const SETLIST_FILENAME = 'setlist-current.json';
 
@@ -143,17 +144,89 @@ const PLAYERS: Record<string, string[]> = {
   Arnold:   ['Tuba'],
 };
 
+export interface SetSong {
+  position: number;
+  title: string;
+  notes: string | null;
+}
+
+export interface SetGroup {
+  label: string;
+  songs: SetSong[];
+}
+
 export interface GigFolderResult {
   folderUrl: string;
   matched: string[];
   unmatched: string[];
 }
 
+function generateSetlistPdf(
+  gigName: string | null,
+  gigDate: string | null,
+  sets: SetGroup[]
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ margin: 60, size: 'A4' });
+    const chunks: Buffer[] = [];
+    doc.on('data', (c: Buffer) => chunks.push(c));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+
+    // Header
+    doc.fontSize(22).font('Helvetica-Bold')
+      .text(gigName ?? 'Setlist', { align: 'center' });
+
+    if (gigDate) {
+      const d = new Date(gigDate + 'T00:00:00');
+      const formatted = d.toLocaleDateString('en-IE', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      });
+      doc.moveDown(0.3).fontSize(13).font('Helvetica')
+        .text(formatted, { align: 'center' });
+    }
+
+    doc.moveDown(1.5);
+
+    const totalSongs = sets.reduce((n, s) => n + s.songs.length, 0);
+    const multiSet = sets.length > 1;
+
+    for (const set of sets) {
+      if (multiSet) {
+        doc.fontSize(10).font('Helvetica-Bold')
+          .fillColor('#555555')
+          .text(set.label.toUpperCase(), { characterSpacing: 1.5 });
+        doc.moveTo(60, doc.y + 4)
+          .lineTo(doc.page.width - 60, doc.y + 4)
+          .strokeColor('#333333').lineWidth(1).stroke();
+        doc.moveDown(0.8);
+      }
+
+      for (const song of set.songs) {
+        doc.fontSize(13).font('Helvetica').fillColor('#000000')
+          .text(`${song.position}.  ${song.title}`, { continued: !!song.notes });
+        if (song.notes) {
+          doc.fontSize(11).font('Helvetica-Oblique').fillColor('#666666')
+            .text(`  ${song.notes}`);
+        }
+        doc.moveDown(0.3);
+      }
+      doc.moveDown(0.8);
+    }
+
+    doc.fontSize(9).font('Helvetica').fillColor('#aaaaaa')
+      .text(`${totalSongs} songs`, { align: 'right' });
+
+    doc.end();
+  });
+}
+
 export async function buildGigFolder(
   gigName: string | null,
   gigDate: string | null,
-  songTitles: string[]
+  sets: SetGroup[]
 ): Promise<GigFolderResult> {
+  const songTitles = sets.flatMap(s => s.songs.map(song => song.title));
   const drive = getClient();
   const rootFolderId = process.env.GOOGLE_DRIVE_FOLDER_ID!;
   const songsFolderId = process.env.GOOGLE_SONGS_FOLDER_ID ?? DEFAULT_SONGS_FOLDER_ID;
@@ -180,7 +253,19 @@ export async function buildGigFolder(
   const gigFolderId = gigFolderRes.data.id!;
   const folderUrl = gigFolderRes.data.webViewLink ?? `https://drive.google.com/drive/folders/${gigFolderId}`;
 
-  // 3. Index all song folders from "Music by Song"
+  // 3. Generate and upload setlist PDF to the gig folder root
+  try {
+    const pdfBuffer = await generateSetlistPdf(gigName, gigDate, sets);
+    await drive.files.create({
+      requestBody: { name: 'Setlist.pdf', parents: [gigFolderId] },
+      media: { mimeType: 'application/pdf', body: Readable.from([pdfBuffer]) },
+      fields: 'id',
+    });
+  } catch (err) {
+    console.error('[drive] Could not generate setlist PDF:', (err as Error).message);
+  }
+
+  // 4. Index all song folders from "Music by Song"
   const songFoldersRes = await drive.files.list({
     q: `'${songsFolderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
     fields: 'files(id, name)',
@@ -190,7 +275,7 @@ export async function buildGigFolder(
     (songFoldersRes.data.files ?? []).map(f => [normalize(f.name!), { id: f.id!, name: f.name! }])
   );
 
-  // 4. Match setlist songs → PDFs → instruments
+  // 5. Match setlist songs → PDFs → instruments
   const instrumentFiles = new Map<string, Array<{ fileId: string; filename: string }>>();
   const matched: string[] = [];
   const unmatched: string[] = [];
@@ -253,7 +338,7 @@ export async function buildGigFolder(
     }
   }
 
-  // 5. Create a subfolder per player and copy their part's PDFs in
+  // 6. Create a subfolder per player and copy their part's PDFs in
   let playerFolderCount = 0;
   for (const [playerName, parts] of Object.entries(PLAYERS)) {
     const playerFiles = parts.flatMap(p => instrumentFiles.get(p) ?? []);
