@@ -3,59 +3,70 @@
 
 const GIGS = [
   {
-    month: 'AUG',
     day: '14',
-    title: 'Riverside Music Festival',
-    venue: 'Kilkenny, Ireland',
-    time: '8:00 PM · Main Stage',
-    link: '#',
+    month: 'jun',
+    name: 'Summer Sessions',
+    venue: 'Iveagh Gardens, Dublin',
+    badge: 'tickets available',
+    variant: '',
   },
   {
-    month: 'AUG',
-    day: '29',
-    title: "O'Malley's Late Set",
-    venue: 'Galway, Ireland',
-    time: '10:00 PM · Free Entry',
-    link: '#',
+    day: '22',
+    month: 'jul',
+    name: 'Wilderness-on-the-Lee',
+    venue: 'Fitzgerald Park, Cork',
+    badge: 'sold out',
+    variant: 'is-dark',
   },
   {
-    month: 'SEP',
-    day: '12',
-    title: 'Harvest Street Parade',
-    venue: 'Cork, Ireland',
-    time: '2:00 PM · All Ages',
-    link: '#',
+    day: '08',
+    month: 'aug',
+    name: 'Boomtown by the Bay',
+    venue: 'Salthill Prom, Galway',
+    badge: 'free entry',
+    variant: 'is-brand',
   },
   {
-    month: 'OCT',
     day: '03',
-    title: 'Private Wedding (Booked)',
+    month: 'oct',
+    name: 'Private Wedding',
     venue: 'Wicklow, Ireland',
-    time: 'Private Event',
-    link: '#',
+    badge: 'private event',
+    variant: '',
   },
 ];
 
+const GIG_FILTERS = ['all shows', 'dublin', 'cork', 'galway', 'private hire'];
+
 const PRODUCTS = [
-  { name: 'Blastabrass Logo Tee', price: '€28.00', image: 'T-shirt photo' },
-  { name: 'Brass Section Hoodie', price: '€48.00', image: 'Hoodie photo' },
-  { name: 'Snapback Cap', price: '€22.00', image: 'Cap photo' },
-  { name: 'Live at the Docks — Vinyl', price: '€30.00', image: 'Vinyl photo' },
-  { name: 'Tote Bag', price: '€16.00', image: 'Tote photo' },
-  { name: 'Enamel Pin Set', price: '€12.00', image: 'Pins photo' },
+  { name: 'blasta brass. logo tee', price: '€28.00', image: 'T-shirt photo' },
+  { name: 'brass carnage hoodie', price: '€48.00', image: 'Hoodie photo' },
+  { name: 'circle b snapback', price: '€22.00', image: 'Cap photo' },
+  { name: 'live carnage — vinyl', price: '€30.00', image: 'Vinyl photo' },
+  { name: 'nice to smell ya. tote', price: '€16.00', image: 'Tote photo' },
+  { name: 'enamel pin set', price: '€12.00', image: 'Pins photo' },
 ];
+
+function renderGigFilters() {
+  const wrap = document.getElementById('gigFilters');
+  if (!wrap) return;
+  wrap.innerHTML = GIG_FILTERS.map((label, i) => `
+    <span class="chip${i === 0 ? ' chip-active' : ''}">${label}</span>
+  `).join('');
+}
 
 function renderGigs() {
   const list = document.getElementById('gigList');
   if (!list) return;
   list.innerHTML = GIGS.map((gig) => `
-    <li class="gig-item">
-      <div class="gig-date">${gig.month}<span class="day">${gig.day}</span></div>
+    <li class="gig-card ${gig.variant}">
+      <div class="gig-date">${gig.day}<span class="gig-month">${gig.month}</span></div>
       <div class="gig-info">
-        <h3>${gig.title}</h3>
-        <p>${gig.venue} &middot; ${gig.time}</p>
+        <p class="gig-name">${gig.name}</p>
+        <p class="gig-venue">${gig.venue}</p>
       </div>
-      <a class="btn btn-ghost" href="${gig.link}">Details</a>
+      <span class="badge badge-pink">${gig.badge}</span>
+      <a class="btn btn-outline-pink" href="#">details</a>
     </li>
   `).join('');
 }
@@ -69,7 +80,7 @@ function renderProducts() {
       <div class="product-body">
         <h3>${product.name}</h3>
         <p class="product-price">${product.price}</p>
-        <button type="button" class="btn btn-primary" disabled>Add to Cart</button>
+        <button type="button" class="btn btn-primary" disabled>add to cart</button>
       </div>
     </article>
   `).join('');
@@ -90,6 +101,17 @@ function setupNavToggle() {
       nav.classList.remove('is-open');
       toggle.setAttribute('aria-expanded', 'false');
     });
+  });
+}
+
+function setupGigFilters() {
+  const wrap = document.getElementById('gigFilters');
+  if (!wrap) return;
+  wrap.addEventListener('click', (event) => {
+    const chip = event.target.closest('.chip');
+    if (!chip) return;
+    wrap.querySelectorAll('.chip').forEach((c) => c.classList.remove('chip-active'));
+    chip.classList.add('chip-active');
   });
 }
 
@@ -127,9 +149,11 @@ function setYear() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  renderGigFilters();
   renderGigs();
   renderProducts();
   setupNavToggle();
+  setupGigFilters();
   setupContactForm();
   setupScrollReveal();
   setYear();

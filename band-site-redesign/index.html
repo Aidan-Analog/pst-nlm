@@ -3,46 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blastabrass — Live Brass. Big Energy.</title>
-  <meta name="description" content="Blastabrass is a high-energy street brass band available for festivals, weddings and parties. See upcoming gigs, shop merch, and book us." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>blasta brass. — nice to smell ya.</title>
+  <meta name="description" content="blasta brass. is a 14-piece brass band from Ireland playing Pop, Rock, Funk and Soul. See upcoming gigs, shop merch, and book us for your event." />
+  <link rel="icon" type="image/png" href="assets/logos/bb-icon.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
   <div class="placeholder-banner">
-    DESIGN MOCKUP — placeholder copy, dates &amp; prices. Not connected to Shopify or a live store. See README.md.
+    <strong>DESIGN MOCKUP</strong> — built from the real Blasta Brass brand kit, placeholder gig dates &amp; merch prices only. Not connected to Shopify. See README.md.
   </div>
 
   <header class="site-header" id="top">
     <div class="container header-inner">
-      <a class="logo" href="#top">Blasta<span>brass</span></a>
+      <a href="#top">
+        <img class="logo-img" src="assets/logos/Blasta-pnk-horiz.svg" alt="blasta brass." />
+      </a>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
       <nav class="site-nav" id="siteNav">
-        <a href="#about">About</a>
-        <a href="#gigs">Gigs</a>
-        <a href="#merch">Merch</a>
-        <a href="#contact">Contact</a>
-        <a href="#merch" class="nav-cta">Shop</a>
+        <a href="#about">about</a>
+        <a href="#gigs">gigs</a>
+        <a href="#merch">merch</a>
+        <a href="#contact">contact</a>
+        <a href="#merch" class="btn btn-primary nav-cta">shop</a>
       </nav>
     </div>
   </header>
 
   <main>
     <!-- HERO -->
-    <section id="hero" class="hero">
-      <div class="hero-bg" aria-hidden="true"></div>
+    <section id="hero" class="hero stave-pattern">
       <div class="container hero-inner reveal">
-        <p class="eyebrow">Ireland &middot; Street &amp; Festival Brass</p>
-        <h1>Live brass that moves the room.</h1>
-        <p class="hero-sub">Seven horns, one groove. Blastabrass brings New Orleans-style brass energy to festivals, weddings, and parties across Ireland.</p>
+        <img class="hero-icon" src="assets/logos/bb-icon.png" alt="" aria-hidden="true" />
+        <p class="eyebrow" style="color:rgba(255,255,255,0.65)">ireland &middot; 14-piece brass band</p>
+        <h1 class="bb-h1">pop. rock. funk. <span class="accent">soul.</span></h1>
+        <p class="script-tag hero-tagline">nice to smell ya.</p>
+        <p class="hero-sub">14 pieces of pure brass carnage. We play festivals, weddings, parties &amp; the odd unsuspecting street corner — loud, fun, and never too serious about it.</p>
         <div class="hero-actions">
-          <a href="#gigs" class="btn btn-primary">See Upcoming Gigs</a>
-          <a href="#merch" class="btn btn-ghost">Shop Merch</a>
+          <a href="#contact" class="btn btn-primary">book us</a>
+          <a href="#gigs" class="btn btn-outline-pink on-dark">see the shows</a>
         </div>
       </div>
       <a href="#about" class="scroll-cue" aria-label="Scroll to About section">↓</a>
@@ -53,15 +54,20 @@
       <div class="container about-grid reveal">
         <div class="about-media" aria-hidden="true">
           <div class="photo-frame">
-            <span>Band photo placeholder</span>
+            <span>band photo placeholder</span>
           </div>
         </div>
         <div class="about-copy">
-          <p class="eyebrow">About Us</p>
-          <h2>Seven-piece brass, built for the street.</h2>
-          <p>Blastabrass formed out of a shared love of second-line grooves, ska horn lines, and the kind of brass that gets a whole crowd moving. No stage required — we play in the middle of the room, on the street, or wherever the party actually is.</p>
-          <p>We've powered wedding walk-ins, festival main-stage warm-ups, and Saturday night pub crawls in equal measure, building a set list that swings between original tunes and horn-driven reworks of songs everyone already knows.</p>
-          <p>Available as a full seven-piece or a stripped-back quartet, depending on your space and budget — get in touch and we'll build the right lineup for your event.</p>
+          <p class="eyebrow">about us</p>
+          <h2 class="bb-h2">big bold fun.</h2>
+          <div class="genre-badges">
+            <span class="badge badge-light-pink">Pop</span>
+            <span class="badge badge-light-pink">Rock</span>
+            <span class="badge badge-light-blue">Funk</span>
+            <span class="badge badge-light-blue">Soul</span>
+          </div>
+          <p>We're 14 pieces of pure brass carnage, based in Ireland and built for the room, not the stage. No corporate polish here — just horns, a rhythm section, and a set list that swings from original tunes to horn-driven reworks everyone already knows the words to.</p>
+          <p>We've opened festival main stages, walked wedding parties down the street, and closed out more than a few pub nights that were absolutely never supposed to run this late. Full 14-piece, or a stripped-back combo for smaller spaces — we'll build the right lineup for your event.</p>
           <p class="placeholder-note">Placeholder bio — replace with the band's real story, member names, and photos.</p>
         </div>
       </div>
@@ -70,8 +76,9 @@
     <!-- GIGS -->
     <section id="gigs" class="gigs">
       <div class="container reveal">
-        <p class="eyebrow">Gigs</p>
-        <h2>Upcoming Shows</h2>
+        <p class="eyebrow">gigs</p>
+        <h2 class="bb-h2">catch us live.</h2>
+        <div class="gig-filters" id="gigFilters"><!-- populated by script.js --></div>
         <ul class="gig-list" id="gigList"><!-- populated by script.js --></ul>
         <p class="placeholder-note">Placeholder dates &amp; venues — wire this list up to real tour dates before launch.</p>
       </div>
@@ -80,19 +87,19 @@
     <!-- MERCH -->
     <section id="merch" class="merch">
       <div class="container reveal">
-        <p class="eyebrow">Merch</p>
-        <h2>Shop the Band</h2>
+        <p class="eyebrow">merch</p>
+        <h2 class="bb-h2">shop the band.</h2>
         <div class="product-grid" id="productGrid"><!-- populated by script.js --></div>
-        <p class="placeholder-note">Placeholder products &amp; prices — "Add to cart" is non-functional here. In Shopify this becomes a real product collection.</p>
+        <p class="placeholder-note">Placeholder products &amp; prices — "add to cart" is non-functional here. In Shopify this becomes a real product collection.</p>
       </div>
     </section>
 
     <!-- CONTACT -->
-    <section id="contact" class="contact">
+    <section id="contact" class="contact stave-pattern">
       <div class="container contact-grid reveal">
         <div class="contact-copy">
-          <p class="eyebrow">Contact &amp; Bookings</p>
-          <h2>Book the band.</h2>
+          <p class="eyebrow">contact &amp; bookings</p>
+          <h2 class="bb-h2" style="color:#fff">book the band.</h2>
           <p>Weddings, festivals, corporate events, private parties — send us the details and we'll get back to you with availability and a quote.</p>
           <dl class="contact-details">
             <div>
@@ -112,7 +119,7 @@
               </dd>
             </div>
           </dl>
-          <p class="placeholder-note">Placeholder contact details &amp; social links.</p>
+          <p class="placeholder-note" style="color:rgba(255,255,255,0.6)">Placeholder contact details &amp; social links.</p>
         </div>
         <form class="contact-form" id="contactForm" novalidate>
           <div class="field">
@@ -131,7 +138,7 @@
             <label for="message">Tell us about your event</label>
             <textarea id="message" name="message" rows="4" required></textarea>
           </div>
-          <button type="submit" class="btn btn-primary btn-block">Send Enquiry</button>
+          <button type="submit" class="btn btn-primary btn-block">send enquiry</button>
           <p class="form-note" id="formNote" role="status" aria-live="polite"></p>
         </form>
       </div>
@@ -140,8 +147,8 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <a class="logo" href="#top">Blasta<span>brass</span></a>
-      <p>&copy; <span id="year"></span> Blastabrass. Design mockup — not a live storefront.</p>
+      <img class="logo-img" src="assets/logos/Blasta-hor-wht.svg" alt="blasta brass." style="height:32px" />
+      <p>&copy; <span id="year"></span> blasta brass. Design mockup — not a live storefront.</p>
     </div>
   </footer>
 
