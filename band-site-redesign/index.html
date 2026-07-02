@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blastabrass — Live Brass. Big Energy.</title>
+  <meta name="description" content="Blastabrass is a high-energy street brass band available for festivals, weddings and parties. See upcoming gigs, shop merch, and book us." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="placeholder-banner">
+    DESIGN MOCKUP — placeholder copy, dates &amp; prices. Not connected to Shopify or a live store. See README.md.
+  </div>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="logo" href="#top">Blasta<span>brass</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav">
+        <a href="#about">About</a>
+        <a href="#gigs">Gigs</a>
+        <a href="#merch">Merch</a>
+        <a href="#contact">Contact</a>
+        <a href="#merch" class="nav-cta">Shop</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section id="hero" class="hero">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="container hero-inner reveal">
+        <p class="eyebrow">Ireland &middot; Street &amp; Festival Brass</p>
+        <h1>Live brass that moves the room.</h1>
+        <p class="hero-sub">Seven horns, one groove. Blastabrass brings New Orleans-style brass energy to festivals, weddings, and parties across Ireland.</p>
+        <div class="hero-actions">
+          <a href="#gigs" class="btn btn-primary">See Upcoming Gigs</a>
+          <a href="#merch" class="btn btn-ghost">Shop Merch</a>
+        </div>
+      </div>
+      <a href="#about" class="scroll-cue" aria-label="Scroll to About section">↓</a>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="about">
+      <div class="container about-grid reveal">
+        <div class="about-media" aria-hidden="true">
+          <div class="photo-frame">
+            <span>Band photo placeholder</span>
+          </div>
+        </div>
+        <div class="about-copy">
+          <p class="eyebrow">About Us</p>
+          <h2>Seven-piece brass, built for the street.</h2>
+          <p>Blastabrass formed out of a shared love of second-line grooves, ska horn lines, and the kind of brass that gets a whole crowd moving. No stage required — we play in the middle of the room, on the street, or wherever the party actually is.</p>
+          <p>We've powered wedding walk-ins, festival main-stage warm-ups, and Saturday night pub crawls in equal measure, building a set list that swings between original tunes and horn-driven reworks of songs everyone already knows.</p>
+          <p>Available as a full seven-piece or a stripped-back quartet, depending on your space and budget — get in touch and we'll build the right lineup for your event.</p>
+          <p class="placeholder-note">Placeholder bio — replace with the band's real story, member names, and photos.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- GIGS -->
+    <section id="gigs" class="gigs">
+      <div class="container reveal">
+        <p class="eyebrow">Gigs</p>
+        <h2>Upcoming Shows</h2>
+        <ul class="gig-list" id="gigList"><!-- populated by script.js --></ul>
+        <p class="placeholder-note">Placeholder dates &amp; venues — wire this list up to real tour dates before launch.</p>
+      </div>
+    </section>
+
+    <!-- MERCH -->
+    <section id="merch" class="merch">
+      <div class="container reveal">
+        <p class="eyebrow">Merch</p>
+        <h2>Shop the Band</h2>
+        <div class="product-grid" id="productGrid"><!-- populated by script.js --></div>
+        <p class="placeholder-note">Placeholder products &amp; prices — "Add to cart" is non-functional here. In Shopify this becomes a real product collection.</p>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="contact">
+      <div class="container contact-grid reveal">
+        <div class="contact-copy">
+          <p class="eyebrow">Contact &amp; Bookings</p>
+          <h2>Book the band.</h2>
+          <p>Weddings, festivals, corporate events, private parties — send us the details and we'll get back to you with availability and a quote.</p>
+          <dl class="contact-details">
+            <div>
+              <dt>Email</dt>
+              <dd><a href="mailto:bookings@blastabrass.ie">bookings@blastabrass.ie</a></dd>
+            </div>
+            <div>
+              <dt>Phone</dt>
+              <dd><a href="tel:+35300000000">+353 00 000 0000</a></dd>
+            </div>
+            <div>
+              <dt>Follow</dt>
+              <dd class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Facebook</a>
+                <a href="#">YouTube</a>
+              </dd>
+            </div>
+          </dl>
+          <p class="placeholder-note">Placeholder contact details &amp; social links.</p>
+        </div>
+        <form class="contact-form" id="contactForm" novalidate>
+          <div class="field">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="field">
+            <label for="eventDate">Event date</label>
+            <input type="text" id="eventDate" name="eventDate" placeholder="e.g. 14 Sept 2026" />
+          </div>
+          <div class="field">
+            <label for="message">Tell us about your event</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Send Enquiry</button>
+          <p class="form-note" id="formNote" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="logo" href="#top">Blasta<span>brass</span></a>
+      <p>&copy; <span id="year"></span> Blastabrass. Design mockup — not a live storefront.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
