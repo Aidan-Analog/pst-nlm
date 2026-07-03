@@ -1,0 +1,87 @@
+<section class="about" id="about">
+  <div class="container about-grid reveal">
+    <div class="about-media">
+      {%- if section.settings.image != blank -%}
+        <img src="{{ section.settings.image | image_url: width: 900 }}" alt="{{ section.settings.image.alt | default: shop.name }}" loading="lazy" width="900" height="1125">
+      {%- else -%}
+        <div class="photo-frame">
+          <span>band photo placeholder — add one in the theme editor</span>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="about-copy">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      <h2 class="bb-h2">{{ section.settings.heading }}</h2>
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="genre-badges">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'badge' -%}
+              <span class="badge badge-light-{{ block.settings.color }}" {{ block.shopify_attributes }}>{{ block.settings.label }}</span>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      <div class="about-body">
+        {{ section.settings.body }}
+      </div>
+
+      {%- if section.settings.show_placeholder_note -%}
+        <p class="placeholder-note">Placeholder bio — replace with the band's real story, member names, and photos.</p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "About",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Band photo" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "about us" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "big bold fun." },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body copy",
+      "default": "<p>We're 14 pieces of pure brass carnage, based in Ireland and built for the room, not the stage. No corporate polish here — just horns, a rhythm section, and a set list that swings from original tunes to horn-driven reworks everyone already knows the words to.</p><p>We've opened festival main stages, walked wedding parties down the street, and closed out more than a few pub nights that were absolutely never supposed to run this late. Full 14-piece, or a stripped-back combo for smaller spaces — we'll build the right lineup for your event.</p>"
+    },
+    { "type": "checkbox", "id": "show_placeholder_note", "label": "Show placeholder note", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Genre badge",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Pop" },
+        {
+          "type": "select",
+          "id": "color",
+          "label": "Color",
+          "options": [
+            { "value": "pink", "label": "Pink" },
+            { "value": "blue", "label": "Blue" }
+          ],
+          "default": "pink"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "About",
+      "blocks": [
+        { "type": "badge", "settings": { "label": "Pop", "color": "pink" } },
+        { "type": "badge", "settings": { "label": "Rock", "color": "pink" } },
+        { "type": "badge", "settings": { "label": "Funk", "color": "blue" } },
+        { "type": "badge", "settings": { "label": "Soul", "color": "blue" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

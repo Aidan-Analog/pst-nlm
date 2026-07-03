@@ -1,0 +1,83 @@
+<div class="container">
+  <div class="product-main">
+    <div class="product-gallery">
+      {%- if product.featured_image -%}
+        <div class="product-gallery-main">
+          <img id="ProductMainImage" src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.featured_image.alt | escape }}" width="900" height="{{ 900 | divided_by: product.featured_image.aspect_ratio | default: 900 }}">
+        </div>
+        {%- if product.images.size > 1 -%}
+          <div class="product-thumbs" data-product-thumbs data-main-target="#ProductMainImage">
+            {%- for image in product.images -%}
+              <img
+                src="{{ image | image_url: width: 150 }}"
+                data-full-src="{{ image | image_url: width: 900 }}"
+                alt="{{ image.alt | escape }}"
+                class="{% if forloop.first %}active{% endif %}"
+                width="72" height="72"
+              >
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- else -%}
+        <div class="product-gallery-main product-image">
+          <span>{{ product.title }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="product-info">
+      <p class="eyebrow">{{ product.type | default: shop.name }}</p>
+      <h1 class="bb-h2">{{ product.title | downcase }}</h1>
+
+      <p class="product-price">
+        {%- if product.compare_at_price > product.price -%}
+          <s>{{ product.compare_at_price | money }}</s>{{ product.price | money }}
+          <span class="badge badge-pink">sale</span>
+        {%- else -%}
+          {{ product.price | money }}
+        {%- endif -%}
+      </p>
+
+      {%- form 'product', product, class: 'product-form' -%}
+        {%- unless product.has_only_default_variant -%}
+          <div class="field">
+            <label for="ProductVariantSelect">Options</label>
+            <select id="ProductVariantSelect" name="id">
+              {%- for variant in product.variants -%}
+                <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
+                  {{ variant.title }} — {{ variant.price | money }}{% unless variant.available %} (sold out){% endunless %}
+                </option>
+              {%- endfor -%}
+            </select>
+          </div>
+        {%- else -%}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        {%- endunless -%}
+
+        <div class="qty-row" data-qty-wrap>
+          <label for="ProductQty" class="visually-hidden">Quantity</label>
+          <button type="button" class="btn btn-outline-pink btn-sm" data-qty-step="-1" aria-label="Decrease quantity">&minus;</button>
+          <input type="number" id="ProductQty" name="quantity" class="qty-input" value="1" min="1">
+          <button type="button" class="btn btn-outline-pink btn-sm" data-qty-step="1" aria-label="Increase quantity">&plus;</button>
+        </div>
+
+        {%- if product.available -%}
+          <button type="submit" class="btn btn-primary btn-block">add to cart</button>
+        {%- else -%}
+          <button type="submit" class="btn btn-primary btn-block" disabled>sold out</button>
+        {%- endif -%}
+      {%- endform -%}
+
+      <div class="product-description">
+        {{ product.description }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product information",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,17 @@
+{
+  "general": {
+    "search": {
+      "placeholder": "Search products, pages, posts…"
+    },
+    "cart": {
+      "empty": "Your cart is empty."
+    }
+  },
+  "products": {
+    "product": {
+      "sold_out": "Sold out",
+      "on_sale": "Sale",
+      "add_to_cart": "Add to cart"
+    }
+  }
+}

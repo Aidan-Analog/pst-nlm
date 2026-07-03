@@ -1,0 +1,53 @@
+<section class="hero stave-pattern" id="hero">
+  <div class="container hero-inner reveal">
+    {%- if section.settings.show_icon -%}
+      <img class="hero-icon" src="{{ 'icon-badge.png' | asset_url }}" alt="" aria-hidden="true" width="56" height="56">
+    {%- endif -%}
+
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="eyebrow" style="color:rgba(255,255,255,0.65)">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+
+    <h1 class="bb-h1">
+      {{ section.settings.heading_main }} <span class="accent">{{ section.settings.heading_accent }}</span>
+    </h1>
+
+    {%- if section.settings.script_tagline != blank -%}
+      <p class="script-tag hero-tagline">{{ section.settings.script_tagline }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.subtext != blank -%}
+      <p class="hero-sub">{{ section.settings.subtext }}</p>
+    {%- endif -%}
+
+    <div class="hero-actions">
+      {%- if section.settings.primary_label != blank -%}
+        <a href="{{ section.settings.primary_link | default: '#contact' }}" class="btn btn-primary">{{ section.settings.primary_label }}</a>
+      {%- endif -%}
+      {%- if section.settings.secondary_label != blank -%}
+        <a href="{{ section.settings.secondary_link | default: '#gigs' }}" class="btn btn-outline-pink on-dark">{{ section.settings.secondary_label }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero",
+  "settings": [
+    { "type": "checkbox", "id": "show_icon", "label": "Show badge icon", "default": true },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "ireland · 14-piece brass band" },
+    { "type": "text", "id": "heading_main", "label": "Heading (white part)", "default": "pop. rock. funk." },
+    { "type": "text", "id": "heading_accent", "label": "Heading (pink accent part)", "default": "soul." },
+    { "type": "text", "id": "script_tagline", "label": "Script tagline", "default": "nice to smell ya." },
+    { "type": "textarea", "id": "subtext", "label": "Subtext", "default": "14 pieces of pure brass carnage. We play festivals, weddings, parties & the odd unsuspecting street corner — loud, fun, and never too serious about it." },
+    { "type": "text", "id": "primary_label", "label": "Primary button label", "default": "book us" },
+    { "type": "url", "id": "primary_link", "label": "Primary button link" },
+    { "type": "text", "id": "secondary_label", "label": "Secondary button label", "default": "see the shows" },
+    { "type": "url", "id": "secondary_link", "label": "Secondary button link" }
+  ],
+  "presets": [
+    { "name": "Hero" }
+  ]
+}
+{% endschema %}
