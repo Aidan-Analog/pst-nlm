@@ -1,0 +1,48 @@
+<div class="container page-section">
+  <div class="page-header" style="padding-top:0;">
+    <p class="eyebrow">blog</p>
+    <h1 class="bb-h2">{{ blog.title | downcase }}</h1>
+  </div>
+
+  {%- paginate blog.articles by section.settings.articles_per_page -%}
+    {%- if blog.articles.size > 0 -%}
+      <div class="article-grid">
+        {%- for article in blog.articles -%}
+          <article class="article-card">
+            <a href="{{ article.url }}">
+              {%- if article.image -%}
+                <img src="{{ article.image | image_url: width: 600 }}" alt="{{ article.image.alt | escape }}" loading="lazy" width="600" height="{{ 600 | divided_by: article.image.aspect_ratio | default: 340 }}">
+              {%- endif -%}
+              <div class="product-body">
+                <p class="article-meta">{{ article.published_at | date: '%B %d, %Y' }}</p>
+                <h2 class="product-card-title" style="font-size:var(--text-lg);">{{ article.title }}</h2>
+                <p style="color:var(--fg-secondary);font-size:var(--text-sm);">{{ article.excerpt_or_content | strip_html | truncate: 120 }}</p>
+              </div>
+            </a>
+          </article>
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.pages > 1 -%}
+        <nav class="pagination" aria-label="Pagination">
+          {%- if paginate.previous -%}<a href="{{ paginate.previous.url }}">&larr;</a>{%- endif -%}
+          {%- for part in paginate.parts -%}
+            {%- if part.is_link -%}<a href="{{ part.url }}">{{ part.title }}</a>{%- else -%}<span class="current">{{ part.title }}</span>{%- endif -%}
+          {%- endfor -%}
+          {%- if paginate.next -%}<a href="{{ paginate.next.url }}">&rarr;</a>{%- endif -%}
+        </nav>
+      {%- endif -%}
+    {%- else -%}
+      <p class="gig-empty">No posts yet.</p>
+    {%- endif -%}
+  {%- endpaginate -%}
+</div>
+
+{% schema %}
+{
+  "name": "Blog pages",
+  "settings": [
+    { "type": "range", "id": "articles_per_page", "label": "Posts per page", "min": 3, "max": 24, "step": 3, "default": 9 }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,62 @@
+<header class="site-header" id="top">
+  <div class="container header-inner">
+    <a href="{{ routes.root_url }}">
+      {%- if section.settings.logo != blank -%}
+        <img class="logo-img" src="{{ section.settings.logo | image_url: width: 300 }}" alt="{{ shop.name }}" width="150" height="38">
+      {%- else -%}
+        <img class="logo-img" src="{{ 'logo-pink-horiz.svg' | asset_url }}" alt="{{ shop.name }}" width="150" height="38">
+      {%- endif -%}
+    </a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="site-nav" id="siteNav" aria-label="Main">
+      {%- for link in section.settings.menu.links -%}
+        <a href="{{ link.url }}"{% if link.active %} class="active"{% endif %}>{{ link.title | downcase }}</a>
+      {%- endfor -%}
+
+      <a href="{{ section.settings.shop_link | default: '/collections/all' }}" class="btn btn-primary btn-sm">shop</a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="{{ routes.cart_url }}" class="cart-link" aria-label="Cart ({{ cart.item_count }} items)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        {%- if cart.item_count > 0 -%}
+          <span class="cart-count">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo (light background)",
+      "info": "Defaults to the bundled pink horizontal logo if not set"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "url",
+      "id": "shop_link",
+      "label": "\"Shop\" button link",
+      "default": "/collections/all"
+    }
+  ]
+}
+{% endschema %}

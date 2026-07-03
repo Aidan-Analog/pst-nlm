@@ -1,0 +1,26 @@
+<div class="container page-section">
+  <div class="page-header" style="padding-top:0;">
+    <p class="eyebrow">shop by</p>
+    <h1 class="bb-h2">collections.</h1>
+  </div>
+
+  <div class="collection-grid">
+    {%- for collection in collections -%}
+      {%- if collection.handle != 'frontpage' -%}
+        <a href="{{ collection.url }}" class="collection-card">
+          {%- if collection.featured_image -%}
+            <img src="{{ collection.featured_image | image_url: width: 600 }}" alt="{{ collection.title | escape }}" loading="lazy" width="600" height="{{ 600 | divided_by: collection.featured_image.aspect_ratio | default: 450 }}">
+          {%- endif -%}
+          <span class="collection-card-label">{{ collection.title | downcase }}</span>
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "List collections",
+  "settings": []
+}
+{% endschema %}

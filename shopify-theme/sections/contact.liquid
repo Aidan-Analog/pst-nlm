@@ -1,0 +1,85 @@
+<section class="contact stave-pattern" id="contact">
+  <div class="container contact-grid reveal">
+    <div class="contact-copy">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2 class="bb-h2" style="color:#fff">{{ section.settings.heading }}</h2>
+      <p>{{ section.settings.subtext }}</p>
+
+      <dl class="contact-details">
+        {%- if settings.contact_email != blank -%}
+          <div>
+            <dt>Email</dt>
+            <dd><a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a></dd>
+          </div>
+        {%- endif -%}
+        {%- if settings.contact_phone != blank -%}
+          <div>
+            <dt>Phone</dt>
+            <dd><a href="tel:{{ settings.contact_phone | remove: ' ' }}">{{ settings.contact_phone }}</a></dd>
+          </div>
+        {%- endif -%}
+        {%- if settings.social_instagram_link != blank or settings.social_facebook_link != blank or settings.social_youtube_link != blank -%}
+          <div>
+            <dt>Follow</dt>
+            <dd class="social-links">
+              {%- if settings.social_instagram_link != blank -%}<a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener">Instagram</a>{%- endif -%}
+              {%- if settings.social_facebook_link != blank -%}<a href="{{ settings.social_facebook_link }}" target="_blank" rel="noopener">Facebook</a>{%- endif -%}
+              {%- if settings.social_youtube_link != blank -%}<a href="{{ settings.social_youtube_link }}" target="_blank" rel="noopener">YouTube</a>{%- endif -%}
+            </dd>
+          </div>
+        {%- endif -%}
+      </dl>
+    </div>
+
+    {%- form 'contact', id: 'ContactForm', class: 'contact-form' -%}
+      {%- if form.posted_successfully? -%}
+        <p class="form-success">Thanks — we'll get back to you about your event shortly.</p>
+      {%- endif -%}
+
+      {%- if form.errors -%}
+        <div class="form-error-list">
+          <p><strong>Please fix the following:</strong></p>
+          <ul>
+            {%- for field in form.errors -%}
+              <li>{{ form.errors.messages[field] }}</li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      <div class="field">
+        <label for="ContactFormName">Name</label>
+        <input type="text" id="ContactFormName" name="contact[name]" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}" required>
+      </div>
+      <div class="field">
+        <label for="ContactFormEmail">Email</label>
+        <input type="email" id="ContactFormEmail" name="contact[email]" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}" required>
+      </div>
+      <div class="field">
+        <label for="ContactFormEventDate">Event date</label>
+        <input type="text" id="ContactFormEventDate" name="contact[Event date]" placeholder="e.g. 14 Sept 2026">
+      </div>
+      <div class="field">
+        <label for="ContactFormMessage">Tell us about your event</label>
+        <textarea id="ContactFormMessage" name="contact[body]" rows="4" required>{% if form.body %}{{ form.body }}{% endif %}</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">send enquiry</button>
+    {%- endform -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Contact",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "contact & bookings" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "book the band." },
+    { "type": "textarea", "id": "subtext", "label": "Subtext", "default": "Weddings, festivals, corporate events, private parties — send us the details and we'll get back to you with availability and a quote." }
+  ],
+  "presets": [
+    { "name": "Contact" }
+  ]
+}
+{% endschema %}

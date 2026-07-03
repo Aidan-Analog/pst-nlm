@@ -1,0 +1,47 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Blasta Brass",
+    "theme_version": "1.0.0",
+    "theme_author": "Custom build",
+    "theme_documentation_url": "https://github.com/Aidan-Analog/pst-nlm/tree/main/shopify-theme",
+    "theme_support_email": "bookings@blastabrass.ie"
+  },
+  {
+    "name": "Contact",
+    "settings": [
+      {
+        "type": "text",
+        "id": "contact_email",
+        "label": "Booking / contact email",
+        "default": "bookings@blastabrass.ie"
+      },
+      {
+        "type": "text",
+        "id": "contact_phone",
+        "label": "Contact phone",
+        "info": "Leave blank to hide from the site"
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "url",
+        "id": "social_instagram_link",
+        "label": "Instagram"
+      },
+      {
+        "type": "url",
+        "id": "social_facebook_link",
+        "label": "Facebook"
+      },
+      {
+        "type": "url",
+        "id": "social_youtube_link",
+        "label": "YouTube"
+      }
+    ]
+  }
+]

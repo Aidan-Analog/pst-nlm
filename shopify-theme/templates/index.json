@@ -1,0 +1,83 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {}
+    },
+    "about": {
+      "type": "about",
+      "blocks": {
+        "badge-pop": { "type": "badge", "settings": { "label": "Pop", "color": "pink" } },
+        "badge-rock": { "type": "badge", "settings": { "label": "Rock", "color": "pink" } },
+        "badge-funk": { "type": "badge", "settings": { "label": "Funk", "color": "blue" } },
+        "badge-soul": { "type": "badge", "settings": { "label": "Soul", "color": "blue" } }
+      },
+      "block_order": ["badge-pop", "badge-rock", "badge-funk", "badge-soul"],
+      "settings": {}
+    },
+    "gigs": {
+      "type": "gigs",
+      "blocks": {
+        "gig-1": {
+          "type": "gig",
+          "settings": {
+            "day": "14",
+            "month": "jun",
+            "name": "Summer Sessions",
+            "venue": "Iveagh Gardens, Dublin",
+            "filter_tag": "dublin",
+            "badge_label": "tickets available",
+            "card_style": ""
+          }
+        },
+        "gig-2": {
+          "type": "gig",
+          "settings": {
+            "day": "22",
+            "month": "jul",
+            "name": "Wilderness-on-the-Lee",
+            "venue": "Fitzgerald Park, Cork",
+            "filter_tag": "cork",
+            "badge_label": "sold out",
+            "card_style": "is-dark"
+          }
+        },
+        "gig-3": {
+          "type": "gig",
+          "settings": {
+            "day": "08",
+            "month": "aug",
+            "name": "Boomtown by the Bay",
+            "venue": "Salthill Prom, Galway",
+            "filter_tag": "galway",
+            "badge_label": "free entry",
+            "card_style": "is-brand"
+          }
+        },
+        "gig-4": {
+          "type": "gig",
+          "settings": {
+            "day": "03",
+            "month": "oct",
+            "name": "Private Wedding",
+            "venue": "Wicklow, Ireland",
+            "filter_tag": "private hire",
+            "badge_label": "private event",
+            "card_style": ""
+          }
+        }
+      },
+      "block_order": ["gig-1", "gig-2", "gig-3", "gig-4"],
+      "settings": {}
+    },
+    "merch": {
+      "type": "merch",
+      "settings": {}
+    },
+    "contact": {
+      "type": "contact",
+      "settings": {}
+    }
+  },
+  "order": ["hero", "about", "gigs", "merch", "contact"]
+}

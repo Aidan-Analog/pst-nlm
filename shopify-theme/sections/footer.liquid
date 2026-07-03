@@ -1,0 +1,72 @@
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="{{ routes.root_url }}">
+          <img class="logo-img" src="{{ 'logo-white-horiz.svg' | asset_url }}" alt="{{ shop.name }}" style="height:32px" width="150" height="32">
+        </a>
+        {%- if section.settings.blurb != blank -%}
+          <p style="margin-top: var(--space-4); max-width: 320px;">{{ section.settings.blurb }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.menu != blank -%}
+        <div>
+          <p class="footer-heading">explore</p>
+          <ul class="footer-links">
+            {%- for link in section.settings.menu.links -%}
+              <li><a href="{{ link.url }}">{{ link.title | downcase }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      <div>
+        <p class="footer-heading">get in touch</p>
+        <ul class="footer-links">
+          {%- if settings.contact_email != blank -%}
+            <li><a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a></li>
+          {%- endif -%}
+          {%- if settings.contact_phone != blank -%}
+            <li><a href="tel:{{ settings.contact_phone | remove: ' ' }}">{{ settings.contact_phone }}</a></li>
+          {%- endif -%}
+        </ul>
+        <div class="social-links" style="margin-top: var(--space-4);">
+          {%- if settings.social_instagram_link != blank -%}
+            <a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener">Instagram</a>
+          {%- endif -%}
+          {%- if settings.social_facebook_link != blank -%}
+            <a href="{{ settings.social_facebook_link }}" target="_blank" rel="noopener">Facebook</a>
+          {%- endif -%}
+          {%- if settings.social_youtube_link != blank -%}
+            <a href="{{ settings.social_youtube_link }}" target="_blank" rel="noopener">YouTube</a>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-inner">
+      <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Footer menu",
+      "default": "footer"
+    },
+    {
+      "type": "textarea",
+      "id": "blurb",
+      "label": "Short blurb",
+      "default": "14 pieces of pure brass carnage, based in Ireland. Pop, rock, funk, soul."
+    }
+  ]
+}
+{% endschema %}
