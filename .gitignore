@@ -16,6 +16,9 @@ src/**/*.js
 .env
 .env.*
 
+# Generated theme packages (regenerate from shopify-theme/ source)
+blasta-brass-theme.zip
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
