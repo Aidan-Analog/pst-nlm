@@ -16,6 +16,14 @@ src/**/*.js
 .env
 .env.*
 
+# walkthrough-app (standalone app, own tooling - see walkthrough-app/README.md)
+walkthrough-app/storage/*
+!walkthrough-app/storage/.gitkeep
+walkthrough-app/**/node_modules
+walkthrough-app/**/dist
+walkthrough-app/**/.env
+walkthrough-app/**/*.tsbuildinfo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

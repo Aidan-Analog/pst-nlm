@@ -1,0 +1,16 @@
+{
+  "name": "walkthrough-app",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Turns an auctioneer's own listing photos into a polished walkthrough video. Standalone app, independent of the sibling ADI product-search app in this repo.",
+  "scripts": {
+    "install:all": "npm install --prefix client && npm install --prefix server",
+    "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\" --names \"client,server\" --prefix-colors \"cyan,yellow\"",
+    "build": "npm run build --prefix client && npm run build --prefix server",
+    "start": "npm run start --prefix server",
+    "test:server": "npm run build --prefix server && npm run test --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
