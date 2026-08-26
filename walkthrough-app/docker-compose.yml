@@ -1,0 +1,13 @@
+services:
+  walkthrough-app:
+    build: .
+    ports:
+      - '4001:4001'
+    volumes:
+      - walkthrough-storage:/app/storage
+      - ./assets/music:/app/assets/music
+    environment:
+      - PORT=4001
+
+volumes:
+  walkthrough-storage:

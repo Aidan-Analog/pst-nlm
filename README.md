@@ -1,3 +1,13 @@
+# PST Prototype
+
+This repo contains two independent apps:
+
+- **Root app** (this directory) — an Analog Devices Product Selection Table
+  prototype. See below for the Vite template boilerplate.
+- **`walkthrough-app/`** — a standalone property walkthrough video generator
+  for auctioneers. Own frontend, backend, dependencies, and Docker
+  deployment; see `walkthrough-app/README.md`.
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
